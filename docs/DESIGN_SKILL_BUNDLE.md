@@ -34,7 +34,7 @@ The 3D integration is a guided code-reconstruction skill. It does not include an
 
 Requested hostname: `designer.otstwo.com`; planned origin: `http://127.0.0.1:7620`; public MCP path: `/mcp`.
 
-**Do not create a publicly accessible route before enforcing authentication and verifying it end-to-end.** Existing tools can write local files or call external services. Put the tunnel hostname behind an appropriate Cloudflare Access policy and confirm ChatGPT plugin authentication compatibility before registering it. Do not expose the origin port on the LAN. Use the workstation's existing service manager/dashboard for persistent startup after a protected route passes testing.
+Published 23 November 2026 through the existing `techchefs-services` Cloudflare Tunnel and secured with a Cloudflare Access application. An unauthenticated external request to `/health` returned HTTP 302 to Cloudflare Access login; DNS is present on Cloudflare public resolvers. The TechChefs Service Control Center manages the local process and includes it in Windows logon startup. Keep the origin on loopback only. ChatGPT plugin authentication remains a separate integration test; do not treat external login redirect as proof of plugin OAuth compatibility.
 
 The Facebook reel link supplied for this project was inaccessible for technical inspection. No executable code has been taken from it.
 
