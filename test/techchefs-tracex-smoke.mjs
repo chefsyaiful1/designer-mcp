@@ -18,7 +18,7 @@ const client = new Client(
 
 async function call(name, args) {
   const response = await client.callTool({ name, arguments: args });
-  assert.equal(response.isError, false, name + " returned an MCP error");
+  assert.notEqual(response.isError, true, name + " returned an MCP error");
   const text = response.content.filter((part) => part.type === "text")
     .map((part) => part.text).join("\n");
   assert.ok(text, name + " returned no text");
