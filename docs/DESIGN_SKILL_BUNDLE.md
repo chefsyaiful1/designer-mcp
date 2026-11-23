@@ -26,7 +26,7 @@ npm run start:http
 
 Local health endpoint: `http://127.0.0.1:7620/health`. MCP endpoint: `http://127.0.0.1:7620/mcp`. Existing stdio clients continue using `npm start`.
 
-New MCP tools: `list_design_sources` and `read_design_source`. These read verified Markdown files **only** from the five pinned clones. No caller-controlled arbitrary filesystem read or arbitrary shell execution is added. The original Designer MCP tools remain available unchanged. Upstream scripts are provided locally as references, not executed automatically by these new tools.
+New MCP tools: `list_design_sources`, `list_design_documents` and `read_design_source`. These read verified Markdown files **only** from the five pinned clones. No caller-controlled arbitrary filesystem read or arbitrary shell execution is added. The original Designer MCP tools remain available unchanged. Upstream scripts are provided locally as references, not executed automatically by these new tools.
 
 The 3D integration is a guided code-reconstruction skill. It does not include an image-generation model or turn one image into a 3D mesh on the server by itself. The client model must provide the image understanding, code creation, and browser verification. Impeccable's CLI and Taste's browser checker can be run using their upstream instructions separately; the skill reader does not pretend to execute them.
 
@@ -34,7 +34,11 @@ The 3D integration is a guided code-reconstruction skill. It does not include an
 
 Requested hostname: `designer.otstwo.com`; planned origin: `http://127.0.0.1:7620`; public MCP path: `/mcp`.
 
-Published 23 November 2026 through the existing `techchefs-services` Cloudflare Tunnel and secured with a Cloudflare Access application. An unauthenticated external request to `/health` returned HTTP 302 to Cloudflare Access login; DNS is present on Cloudflare public resolvers. The TechChefs Service Control Center manages the local process and includes it in Windows logon startup. Keep the origin on loopback only. ChatGPT plugin authentication remains a separate integration test; do not treat external login redirect as proof of plugin OAuth compatibility.
+Cloudflare Access Managed OAuth is enabled (23 November 2026) with a scoped redirect allowlist for `https://chatgpt.com/connector/oauth/*`. The origin verifies the signed `Cf-Access-Jwt-Assertion` with `jose`, checking signature, issuer and audience. The Windows dashboard controller sets `DESIGNER_ACCESS_ISSUER` and `DESIGNER_ACCESS_AUD` at startup; unauthenticated MCP requests receive HTTP 401. Local HTTP tests require the explicitly opted-in `DESIGNER_ALLOW_LOCAL_UNAUTH=1` test flag, which is removed from managed production startup.
+
+The ChatGPT private plugin was registered and OAuth authorization completed. Its tool catalog advertises 26 callable tools, and independent ChatGPT calls to `list_design_sources`, `list_design_documents` and `list_installed_skills` succeeded. [Open the plugin](https://chatgpt.com/plugins/plugin_asdk_app_6b042697e0a0819191ebb26b5673d98b).
+
+Google Safe Browsing Transparency Report showed **No unsafe content found** for `designer.otstwo.com` (status updated November 23, 2026). No false-positive review or dangerous-site report should be submitted. The MCP hostname is protected by Access, and should not be submitted for public Search indexing.
 
 The Facebook reel link supplied for this project was inaccessible for technical inspection. No executable code has been taken from it.
 

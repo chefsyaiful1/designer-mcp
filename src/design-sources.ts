@@ -1,4 +1,4 @@
-import { existsSync, readFileSync, realpathSync } from 'node:fs';
+import { existsSync, readFileSync, realpathSync, readdirSync } from 'node:fs';
 import { join, relative, isAbsolute } from 'node:path';
 import { fileURLToPath } from 'node:url';
 
@@ -37,4 +37,22 @@ export function readDesignSource(id: string, document?: string) {
   }
   const text = readFileSync(target, 'utf8');
   return { source: id, document: selected, text: text.slice(0, 40000), truncated: text.length > 40000 };
+}
+export function listDesignDocuments(id: string) {
+  const source = catalog.find(item => item.id === id);
+  if (!source) throw new Error('Unknown design source');
+  const folder = join(root, source.directory);
+  if (!existsSync(folder)) throw new Error('Design sources are not installed; run npm run sync:design');
+  const documents: string[] = [];
+  function visit(path: string, depth: number) {
+    if (depth > 10) return;
+    for (const entry of readdirSync(join(folder, path), { withFileTypes: true })) {
+      if (entry.name === '.git' || entry.name === 'node_modules') continue;
+      const item = path ? path + '/' + entry.name : entry.name;
+      if (entry.isDirectory()) visit(item, depth + 1);
+      else if (entry.isFile() && item.endsWith('.md')) documents.push(item);
+    }
+  }
+  visit('', 0);
+  return { source: id, documents: documents.sort() };
 }

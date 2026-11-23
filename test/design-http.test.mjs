@@ -12,7 +12,7 @@ await new Promise(resolve => probe.close(resolve));
 
 const child = spawn(process.execPath, ['serve-http.mjs'], {
   cwd: new URL('..', import.meta.url),
-  env: { ...process.env, PORT: String(port) },
+  env: { ...process.env, PORT: String(port), DESIGNER_ALLOW_LOCAL_UNAUTH: '1' },
   stdio: 'ignore',
 });
 const url = 'http://127.0.0.1:' + port;
@@ -38,6 +38,8 @@ try {
   assert.ok(list.result.tools.find(tool => tool.name === 'read_design_source'));
   const sources = await call(3, 'tools/call', { name: 'list_design_sources', arguments: {} });
   assert.equal(JSON.parse(sources.result.content[0].text).length, 5);
+  const documents = await call(6, 'tools/call', { name: 'list_design_documents', arguments: { source: 'elaya' } });
+  assert.ok(JSON.parse(documents.result.content[0].text).documents.includes('skills/figma-designer/SKILL.md'));
   const guide = await call(4, 'tools/call', { name: 'read_design_source', arguments: { source: 'motion' } });
   assert.ok(guide.result.content[0].text.includes('motion'));
   const blocked = await call(5, 'tools/call', { name: 'read_design_source', arguments: { source: 'taste', document: '../package.json' } });

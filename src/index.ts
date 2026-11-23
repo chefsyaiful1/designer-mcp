@@ -20,7 +20,7 @@ function stitchToolsEnabled(): boolean {
   if (flag === "1") return true;
   return isStitchAvailable();
 }
-import { listDesignSources, readDesignSource } from "./design-sources.js";
+import { listDesignSources, listDesignDocuments, readDesignSource } from "./design-sources.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { MCP_SERVER_VERSION } from "./version.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -267,6 +267,16 @@ function detectInstalledSkills(): Array<{
     });
   }
 
+  for (const source of listDesignSources()) {
+    if (source.installed) {
+      skills.push({
+        name: 'bundle:' + source.id,
+        path: source.mainDocument,
+        description: source.use,
+        tools: ['list_design_documents', 'read_design_source'],
+      });
+    }
+  }
   return skills;
 }
 
@@ -316,6 +326,17 @@ server.setRequestHandler(ListToolsRequestSchema, async () => {
       name: "list_design_sources",
       description: "List five licensed, pinned design skill sources: Taste, Motion Principles, Elaya, Impeccable, and img2threejs.",
       inputSchema: { type: "object", properties: {} },
+    },
+    {
+      name: "list_design_documents",
+      description: "List all bundled Markdown guides, workflows, and references for one design source. Pass a returned document to read_design_source to activate it.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          source: { type: "string", enum: ["taste", "motion", "elaya", "impeccable", "img2threejs"] },
+        },
+        required: ["source"],
+      },
     },
     {
       name: "read_design_source",
@@ -1149,6 +1170,10 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
       switch (name) {
        case "list_design_sources":
          return textResult(name, JSON.stringify(listDesignSources(), null, 2));
+       case "list_design_documents": {
+          const { source } = args as { source: string };
+          return textResult(name, JSON.stringify(listDesignDocuments(source)));
+        }
        case "read_design_source": {
          const { source, document } = args as { source: string; document?: string };
          return textResult(name, JSON.stringify(readDesignSource(source, document)));
