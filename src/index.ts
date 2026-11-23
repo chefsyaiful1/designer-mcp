@@ -20,6 +20,7 @@ function stitchToolsEnabled(): boolean {
   if (flag === "1") return true;
   return isStitchAvailable();
 }
+import { listDesignSources, readDesignSource } from "./design-sources.js";
 import { Server } from "@modelcontextprotocol/sdk/server/index.js";
 import { MCP_SERVER_VERSION } from "./version.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
@@ -28,7 +29,7 @@ import {
   ListToolsRequestSchema,
 } from "@modelcontextprotocol/sdk/types.js";
 import { readFileSync, existsSync, mkdirSync, rmSync, readdirSync } from "fs";
-import { join, dirname } from "path";
+import { join, dirname, resolve } from "path";
 import { fileURLToPath } from "url";
 import { tmpdir } from "os";
 import { spawnSync } from "child_process";
@@ -303,6 +304,7 @@ function runCommand(cmd: string, args: string[], cwd?: string): string {
   return result.stdout;
 }
 
+export function createDesignerServer() {
 const server = new Server(
   { name: "the-designer", version: MCP_SERVER_VERSION },
   { capabilities: { tools: {} } },
@@ -310,6 +312,23 @@ const server = new Server(
 
 server.setRequestHandler(ListToolsRequestSchema, async () => {
   const tools = [
+    {
+      name: "list_design_sources",
+      description: "List five licensed, pinned design skill sources: Taste, Motion Principles, Elaya, Impeccable, and img2threejs.",
+      inputSchema: { type: "object", properties: {} },
+    },
+    {
+      name: "read_design_source",
+      description: "Read verified design guidance from a bundled source. Call list_design_sources first. Optional document is a relative Markdown path within that source.",
+      inputSchema: {
+        type: "object",
+        properties: {
+          source: { type: "string", enum: ["taste", "motion", "elaya", "impeccable", "img2threejs"] },
+          document: { type: "string", description: "Optional source-relative .md path; defaults to the source's main skill" },
+        },
+        required: ["source"],
+      },
+    },
     {
       name: "generate_rules",
       description:
@@ -1128,6 +1147,12 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   try {
     const result = await (async () => {
       switch (name) {
+       case "list_design_sources":
+         return textResult(name, JSON.stringify(listDesignSources(), null, 2));
+       case "read_design_source": {
+         const { source, document } = args as { source: string; document?: string };
+         return textResult(name, JSON.stringify(readDesignSource(source, document)));
+       }
       case "generate_rules": {
         const { style, palette, archetype, hybrid, tailwind } = args as {
           style: string;
@@ -1788,9 +1813,16 @@ server.setRequestHandler(CallToolRequestSchema, async (request) => {
   }
 });
 
+  return server;
+}
+const server = createDesignerServer();
+
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
 }
 
-main().catch(console.error);
+if (process.argv[1] && fileURLToPath(import.meta.url) === resolve(process.argv[1])) {
+  main().catch(console.error);
+}
+export { server };

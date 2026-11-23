@@ -410,3 +410,7 @@ and HTML screenshots, but favicon assembly and multi-size batches are slower. Ru
 ## License
 
 [MIT](LICENSE)
+
+## TechChefs unified design skill bundle
+
+Five pinned design-skill repositories (Taste, Motion Principles, Elaya, Impeccable, img2threejs) are accessible through `list_design_sources` and `read_design_source`. See [deployment and security guide](docs/DESIGN_SKILL_BUNDLE.md). Run `npm run sync:design` before using those tools. HTTP serving: `npm run start:http` (localhost port 7620); `designer.otstwo.com` is a protected-deployment target, not yet live until DNS and access control are configured.

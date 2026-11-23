@@ -1,0 +1,44 @@
+{
+  "taste": {
+    "repo": "Leonxlnx/taste-skill",
+    "sha": "6c0b5c78f5d31776e2210305abaa210cdc0030bf",
+    "paths": [
+      "skills",
+      "scripts",
+      "assets"
+    ]
+  },
+  "motion": {
+    "repo": "kylezantos/design-motion-principles",
+    "sha": "4a9ca879f24a361f4dca4174fe2da0f67b5ddee3",
+    "paths": [
+      "skills"
+    ]
+  },
+  "elaya": {
+    "repo": "elayadesign/ai-design-skills",
+    "sha": "456d9e0d3e2d84c748bb143c6ca3d90c45e16213",
+    "paths": [
+      "skills"
+    ]
+  },
+  "impeccable": {
+    "repo": "pbakaus/impeccable",
+    "sha": "b49177d32788f2dc585c42831d845dacf1ebed2c",
+    "paths": [
+      "skill"
+    ]
+  },
+  "img2threejs": {
+    "repo": "img2threejs/img2threejs",
+    "sha": "0c0c49bc168e648dbaf9c8c080474de0b3a941b6",
+    "paths": [
+      "skills",
+      "grimoire",
+      "forge",
+      "scripts",
+      "integrations",
+      "assets"
+    ]
+  }
+}
