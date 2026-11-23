@@ -26,3 +26,19 @@ jobs:
       - run: npm ci
       - run: npm run build
       - run: npm test
+      - name: Functional TraceX dashboard smoke test
+        run: node test/techchefs-tracex-smoke.mjs
+      - name: Capture illustrative dashboard previews
+        run: |
+          CHROME=$(command -v google-chrome || command -v chromium || true)
+          if [ -n "$CHROME" ] && [ -f test-results/tracex-dashboard.html ]; then
+            timeout 25s "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=2500 --window-size=1440,900 --screenshot="$PWD/test-results/tracex-desktop.png" "file://$PWD/test-results/tracex-dashboard.html" >/dev/null 2>&1 || true
+            timeout 25s "$CHROME" --headless --no-sandbox --disable-gpu --disable-dev-shm-usage --hide-scrollbars --virtual-time-budget=2500 --window-size=390,844 --screenshot="$PWD/test-results/tracex-mobile.png" "file://$PWD/test-results/tracex-dashboard.html" >/dev/null 2>&1 || true
+          fi
+      - name: Upload TraceX demonstration and audit
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: techchefs-tracex-designer-smoke
+          path: test-results/
+          if-no-files-found: warn
